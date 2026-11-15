@@ -1,69 +1,67 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ProductGrid } from "@/components/ProductCard";
+import { BRAND, CATEGORIES } from "@/lib/brand";
+import { PRODUCTS } from "@/lib/products";
 
-export default function Home() {
+const newest = [...PRODUCTS].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).filter((p) => p.isNew).slice(0, 8);
+const best = [...PRODUCTS].sort((a, b) => b.popularity - a.popularity).slice(0, 8);
+
+function Section({ title, href, children }: { title: string; href: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+      <div className="mb-6 flex items-end justify-between">
+        <h2 className="text-xl font-bold">{title}</h2>
+        <Link href={href} className="text-sm underline">전체 보기</Link>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <>
+      <section className="bg-soft">
+        <div className="mx-auto flex min-h-[420px] max-w-7xl flex-col justify-center px-4 py-16 sm:min-h-[520px] sm:px-6">
+          <p className="text-sm tracking-[0.3em] text-muted">2026 F/W COLLECTION</p>
+          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
+            {BRAND.tagline}
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-5 max-w-md text-muted">
+            유행을 타지 않는 실루엣과 소재. 하루 종일 편하고, 어디에나 어울리는 기본을 만듭니다.
           </p>
+          <div className="mt-8 flex gap-3">
+            <Link href="/products" className="bg-ink px-8 py-3 text-sm font-medium text-paper hover:bg-ink/85">
+              전체 상품 보기
+            </Link>
+            <Link href="/products?category=outer" className="border border-ink px-8 py-3 text-sm font-medium hover:bg-ink hover:text-paper">
+              아우터
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      <section aria-label="카테고리 바로가기" className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
+        <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {CATEGORIES.map((c) => (
+            <li key={c.id}>
+              <Link
+                href={`/products?category=${c.id}`}
+                className="flex h-28 items-end border border-line p-4 text-lg font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-paper"
+              >
+                {c.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <Section title="신상품" href="/products?sort=new">
+        <ProductGrid products={newest} />
+      </Section>
+      <Section title="베스트" href="/products?sort=popular">
+        <ProductGrid products={best} />
+      </Section>
+    </>
   );
 }
