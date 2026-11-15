@@ -28,6 +28,9 @@ npm run dev                  # http://localhost:3000
 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` | 토스페이먼츠 결제위젯 **테스트** 클라이언트 키 (`test_gck_...`) |
 | `TOSS_SECRET_KEY` | 같은 세트의 **테스트** 시크릿 키 (`test_gsk_...`, 서버 전용) |
 
+| `NEXT_PUBLIC_SITE_URL` | 배포된 사이트의 정식 주소. canonical·sitemap·Open Graph·구조화 데이터의 기준 URL (Vercel은 비워 두면 자동) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | 구글 서치콘솔 'HTML 태그' 소유권 확인 값 (선택) |
+
 - 키는 [토스페이먼츠 개발자센터](https://developers.tosspayments.com/my/api-keys)에서 확인합니다.
 - 이 데모는 `test_`로 시작하는 키만 허용하며, `live_` 키는 서버가 거부합니다.
 - `.env.local`은 git에 올라가지 않습니다. 시크릿 키를 코드나 이슈에 붙여넣지 마세요.

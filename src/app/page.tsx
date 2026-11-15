@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 import { ProductGrid } from "@/components/ProductCard";
+import { faqLd, FAQ, organizationLd, websiteLd } from "@/lib/seo";
 import { BRAND, CATEGORIES } from "@/lib/brand";
 import { PRODUCTS } from "@/lib/products";
 
@@ -21,6 +23,9 @@ function Section({ title, href, children }: { title: string; href: string; child
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={organizationLd()} />
+      <JsonLd data={websiteLd()} />
+      <JsonLd data={faqLd()} />
       <section className="bg-soft">
         <div className="mx-auto flex min-h-[420px] max-w-7xl flex-col justify-center px-4 py-16 sm:min-h-[520px] sm:px-6">
           <p className="text-sm tracking-[0.3em] text-muted">2026 F/W COLLECTION</p>
@@ -34,7 +39,7 @@ export default function HomePage() {
             <Link href="/products" className="bg-ink px-8 py-3 text-sm font-medium text-paper hover:bg-ink/85">
               전체 상품 보기
             </Link>
-            <Link href="/products?category=outer" className="border border-ink px-8 py-3 text-sm font-medium hover:bg-ink hover:text-paper">
+            <Link href="/category/outer" className="border border-ink px-8 py-3 text-sm font-medium hover:bg-ink hover:text-paper">
               아우터
             </Link>
           </div>
@@ -46,7 +51,7 @@ export default function HomePage() {
           {CATEGORIES.map((c) => (
             <li key={c.id}>
               <Link
-                href={`/products?category=${c.id}`}
+                href={`/category/${c.id}`}
                 className="flex h-28 items-end border border-line p-4 text-lg font-semibold transition-colors hover:border-ink hover:bg-ink hover:text-paper"
               >
                 {c.label}
@@ -62,6 +67,18 @@ export default function HomePage() {
       <Section title="베스트" href="/products?sort=popular">
         <ProductGrid products={best} />
       </Section>
+
+      <section aria-labelledby="faq-title" className="mx-auto mt-24 max-w-3xl px-4 sm:px-6">
+        <h2 id="faq-title" className="mb-6 text-xl font-bold">자주 묻는 질문</h2>
+        <dl className="divide-y divide-line border-y border-line">
+          {FAQ.map((f) => (
+            <div key={f.q} className="py-5">
+              <dt className="font-medium">{f.q}</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-muted">{f.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </>
   );
 }

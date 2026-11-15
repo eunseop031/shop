@@ -40,17 +40,29 @@ function ProductList({ items }: { items: Product[] }) {
 const chip = (active: boolean) =>
   `rounded-full border px-3 py-1 text-sm ${active ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"}`;
 
-export function ProductBrowser({ mode }: { mode: "list" | "search" }) {
+export function ProductBrowser({
+  mode,
+  fixedCategory,
+  description,
+}: {
+  mode: "list" | "search";
+  /** 카테고리 전용 페이지(/category/[slug])에서 카테고리를 URL 경로로 고정 */
+  fixedCategory?: string;
+  description?: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const query = useMemo(() => parseQuery(sp), [sp]);
+  const query = useMemo(() => {
+    const q = parseQuery(sp);
+    return fixedCategory ? { ...q, category: fixedCategory } : q;
+  }, [sp, fixedCategory]);
   const items = useMemo(() => runQuery(query), [query]);
   const category = CATEGORIES.find((c) => c.id === query.category);
   const activeFilters =
-    (query.category ? 1 : 0) + (query.price ? 1 : 0) + query.sizes.length + query.colors.length;
+    (query.category && !fixedCategory ? 1 : 0) + (query.price ? 1 : 0) + query.sizes.length + query.colors.length;
 
   function update(mutate: (p: URLSearchParams) => void) {
     const p = new URLSearchParams(sp.toString());
@@ -83,6 +95,7 @@ export function ProductBrowser({ mode }: { mode: "list" | "search" }) {
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
         <div>
           <h1 className="text-2xl font-bold">{title}</h1>
+          {description && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{description}</p>}
           <p className="mt-1 text-sm text-muted" aria-live="polite">
             {mode === "search" && !query.q ? "검색어를 입력해 주세요." : `${items.length}개의 상품`}
           </p>
@@ -121,12 +134,25 @@ export function ProductBrowser({ mode }: { mode: "list" | "search" }) {
           <fieldset>
             <legend className="mb-2 text-sm font-semibold">카테고리</legend>
             <div className="flex flex-wrap gap-2">
-              <button type="button" className={chip(!query.category)} aria-pressed={!query.category}
-                onClick={() => update((p) => { p.delete("category"); p.delete("sub"); })}>전체</button>
-              {CATEGORIES.map((c) => (
-                <button key={c.id} type="button" className={chip(query.category === c.id)} aria-pressed={query.category === c.id}
-                  onClick={() => update((p) => { p.set("category", c.id); p.delete("sub"); })}>{c.label}</button>
-              ))}
+              {fixedCategory ? (
+                // 카테고리 페이지에서는 크롤 가능한 일반 링크로 이동
+                <>
+                  <Link href="/products" className={chip(false)}>전체</Link>
+                  {CATEGORIES.map((c) => (
+                    <Link key={c.id} href={`/category/${c.id}`} className={chip(fixedCategory === c.id)}
+                      aria-current={fixedCategory === c.id ? "page" : undefined}>{c.label}</Link>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <button type="button" className={chip(!query.category)} aria-pressed={!query.category}
+                    onClick={() => update((p) => { p.delete("category"); p.delete("sub"); })}>전체</button>
+                  {CATEGORIES.map((c) => (
+                    <button key={c.id} type="button" className={chip(query.category === c.id)} aria-pressed={query.category === c.id}
+                      onClick={() => update((p) => { p.set("category", c.id); p.delete("sub"); })}>{c.label}</button>
+                  ))}
+                </>
+              )}
             </div>
             {category && category.subs.length > 1 && (
               <div className="mt-3 flex flex-wrap gap-2">

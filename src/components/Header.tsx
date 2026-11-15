@@ -37,7 +37,7 @@ export function Header() {
         <nav aria-label="카테고리" className="ml-6 hidden gap-6 text-sm md:flex">
           <Link href="/products" className="hover:underline">전체</Link>
           {CATEGORIES.map((c) => (
-            <Link key={c.id} href={`/products?category=${c.id}`} className="hover:underline">
+            <Link key={c.id} href={`/category/${c.id}`} className="hover:underline">
               {c.label}
             </Link>
           ))}
@@ -79,7 +79,7 @@ export function Header() {
       <nav aria-label="카테고리(모바일)" className="flex gap-5 overflow-x-auto border-t border-line px-4 py-2 text-sm md:hidden">
         <Link href="/products" className="shrink-0">전체</Link>
         {CATEGORIES.map((c) => (
-          <Link key={c.id} href={`/products?category=${c.id}`} className="shrink-0">
+          <Link key={c.id} href={`/category/${c.id}`} className="shrink-0">
             {c.label}
           </Link>
         ))}
